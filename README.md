@@ -1,161 +1,103 @@
 # Multimodal Deep Learning for Landslide Susceptibility and Short-Term Hazard Prediction
 
-## Overview
+A proposed system combining terrain data, satellite imagery, and rainfall observations to estimate landslide susceptibility and short-term hazard. This repository currently provides a project scaffold, synthetic sample records, validation tests, and design documentation—not a trained or validated prediction model.
 
-This project proposes a multimodal deep-learning system to assess landslide susceptibility and estimate short-term landslide hazards by combining terrain data, satellite imagery, and rainfall observations.
+## Project status
 
-The goal is to provide risk estimates and map-based decision support to help disaster management authorities prioritize vulnerable areas and improve preparedness.
+**Prototype scaffold / research proposal.** Model training, reliable datasets, evaluation, and deployment are not yet implemented. The sample data is synthetic and must not be used for real-world risk decisions.
 
-**Project Status:** Proposed system. Model training, experimental evaluation, and deployment require implementation and validation.
+## Proposed capabilities
 
-## Problem Statement
+- Terrain feature processing from Digital Elevation Models (DEM).
+- Satellite-image quality checks, including cloud/shadow handling where applicable.
+- Explicit handling of missing or unusable satellite observations.
+- Separate terrain, satellite, and rainfall encoders with feature fusion.
+- Two outputs: susceptibility mapping and short-term hazard estimation.
+- Geographic train/validation/test separation.
+- Confidence-filtered pseudo-labeling and controlled periodic retraining as future capabilities.
 
-Landslides threaten lives, homes, infrastructure, and livelihoods in vulnerable regions. Risk assessment is challenging because data comes from multiple sources, satellite imagery may be obscured by clouds, verified landslide records may be limited, and models trained in one region may not generalize to others.
+## Technology plan
 
-## Proposed Solution
+Python, PyTorch, NumPy, pandas, scikit-learn, Rasterio/GDAL, GeoPandas, and optionally FastAPI and PostgreSQL/PostGIS. The current starter only uses Python's standard library and pytest for sample-data validation.
 
-The system combines three input modalities:
+## Setup
 
-1. **Terrain Data:** Digital Elevation Models (DEM) and derived features such as slope, aspect, elevation, and curvature.
-2. **Satellite Imagery:** Optical, SAR, or other suitable remote-sensing observations, subject to availability and quality checks.
-3. **Rainfall Data:** Gridded or station-based observations organized into recent time sequences.
+### 1. Requirements
 
-Separate encoders process terrain, satellite, and rainfall inputs. Their learned representations are fused to produce two outputs:
+- Python 3.10 or newer
+- pip
+- Git (optional)
 
-- **Landslide Susceptibility:** A spatial estimate of potentially landslide-prone areas.
-- **Short-Term Hazard Estimation:** An estimate of hazard probability or risk over a defined future time horizon.
+### 2. Create and activate a virtual environment
 
-## Key Features
-
-- **Multimodal Learning:** Combines terrain, satellite, and rainfall information.
-- **Satellite Quality Handling:** Identifies or masks cloud- and shadow-affected imagery where applicable.
-- **Missing-Modality Handling:** Provides an explicit fallback when satellite data is unavailable or unusable.
-- **Geographic Generalization:** Uses geographically separate training, validation, and held-out test regions.
-- **Confidence-Filtered Pseudo-Labeling:** Selects candidate labels for unlabeled observations using confidence and eligibility checks.
-- **Periodic Retraining:** Incorporates new verified observations while retaining historical data.
-- **Model Versioning:** Evaluates candidate models before accepting updates and supports retaining the previous model when an update fails evaluation.
-
-These features describe the proposed design and require implementation and testing.
-
-## Technology Stack
-
-| Component | Proposed Technology |
-|---|---|
-| Programming Language | Python |
-| Deep Learning | PyTorch |
-| Geospatial Processing | Rasterio, GDAL, GeoPandas |
-| Data Processing | NumPy, pandas, scikit-learn |
-| Image Processing | OpenCV or scikit-image |
-| Backend API | FastAPI |
-| Map Visualization | Leaflet or another GIS mapping library |
-| Database | PostgreSQL/PostGIS |
-| Deployment | Optional cloud-based inference and model storage |
-
-## System Workflow
-
-```text
-Terrain Data (DEM)
-        |
-Terrain Preprocessing
-        |
-Terrain Encoder ------------------+
-                                  |
-Satellite Imagery                 |
-        |                         |
-Quality Checks and Masking        +--> Feature Fusion
-        |                         |          |
-Satellite Encoder ----------------+          |
-                                             |
-Rainfall Data                                |
-        |                                    |
-Temporal Preprocessing                       |
-        |                                    |
-Rainfall Encoder ----------------------------+
-                                             |
-                                  +----------+----------+
-                                  |                     |
-                                  v                     v
-                         Landslide Susceptibility   Short-Term
-                              Estimation            Hazard Estimation
+**Windows (PowerShell):**
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
 ```
 
-Additional workflows will handle geographic evaluation, pseudo-label selection, and controlled model retraining.
+**macOS/Linux:**
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
 
-## Data and Validation Plan
+### 3. Install dependencies
 
-Suitable datasets must be identified and checked for licensing, geographic coverage, temporal coverage, spatial resolution, and label quality.
+```bash
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
 
-The planned evaluation will include:
+### 4. Configure environment variables
 
-- Defining target labels and the short-term prediction horizon.
-- Separating training, validation, and geographically held-out test regions.
-- Selecting appropriate classification and probability-quality metrics.
-- Evaluating performance across different geographic regions.
-- Comparing the model with suitable baseline approaches.
-- Documenting missing data, uncertainty, class imbalance, and limitations.
+Copy `.env.example` to `.env` and adjust values for your environment. The current scaffold reads no secrets and does not automatically load `.env`; these variables document planned configuration for future components. Do not commit credentials or private API keys.
 
-Geographic data leakage must be avoided. Pseudo-labels must remain distinguishable from verified ground-truth labels.
+### 5. Run sample-data validation
 
-## Expected Impact
+```bash
+python -m pytest
+```
 
-If successfully developed and validated, the system could:
+Expected result: tests validate the synthetic CSV structure and basic value constraints. These tests do **not** test a trained model.
 
-- Help identify areas that may require closer monitoring.
-- Support disaster-management planning and prioritization.
-- Provide risk estimates to relevant authorities.
-- Improve preparedness in landslide-prone communities.
-- Support evidence-based decisions for risk reduction.
-
-The system is intended as a decision-support tool, not a replacement for official warnings, field assessments, or expert judgment.
-
-## Relevant UN Sustainable Development Goals
-
-- **SDG 11 — Sustainable Cities and Communities:** Supporting safer and more resilient settlements.
-- **SDG 13 — Climate Action:** Supporting hazard-risk assessment and resilience.
-- **SDG 9 — Industry, Innovation and Infrastructure:** Applying emerging technologies to resilient infrastructure planning.
-
-## Risks and Limitations
-
-- Cloud cover and missing satellite observations may reduce input quality.
-- Verified landslide labels may be limited or imbalanced.
-- Geographic and temporal changes may reduce model reliability.
-- Confidence scores do not guarantee that pseudo-labels are correct.
-- Short-term hazard estimation requires time-aligned data and rigorous validation.
-- Real-world alerts require operational testing and coordination with responsible authorities.
-
-## Suggested Repository Structure
+## Repository layout
 
 ```text
 landslide-hazard-estimation/
 ├── README.md
-├── data/
-│   └── README.md
-├── notebooks/
-├── src/
-│   ├── preprocessing/
-│   ├── models/
-│   ├── evaluation/
-│   └── training/
-├── api/
-├── tests/
-├── configs/
+├── LICENSE
+├── .env.example
 ├── requirements.txt
-└── docs/
-    └── figures/
+├── data/
+│   └── sample/
+│       ├── sample_observations.csv
+│       └── README.md
+├── docs/
+│   └── technical-design.md
+├── src/
+│   └── data_validation.py
+└── tests/
+    └── test_sample_data.py
 ```
 
-This is a suggested structure and does not imply that these modules have already been implemented.
+## Sample data
 
-## Getting Started
+`data/sample/sample_observations.csv` contains illustrative synthetic rows with terrain variables, recent rainfall, satellite availability, and a placeholder target label. The values are fabricated for software testing and are not derived from a real location or verified landslide event.
 
-The implementation setup is not yet finalized. Once development begins, document the tested Python version, installation instructions, dataset preparation, configuration, training commands, evaluation commands, and API launch instructions.
+## Validation and safety notes
 
-Only include commands that have been tested successfully.
+- Do not treat the synthetic records as scientific evidence or ground truth.
+- Define the short-term prediction horizon before training.
+- Avoid spatial and temporal leakage between data splits.
+- Keep verified labels separate from pseudo-labels.
+- Report region-wise metrics and uncertainty.
+- Do not issue public warnings from this scaffold; operational use requires expert review, validation, monitoring, and coordination with responsible authorities.
 
-## References
+## Documentation
 
-Add the actual research papers, dataset sources, and official documentation used during implementation. Ensure that all datasets are used according to their licenses and attribution requirements.
+See [`docs/technical-design.md`](docs/technical-design.md) for the proposed architecture, data flow, validation approach, risks, and implementation stages.
 
-## Disclaimer
+## License
 
-This README describes a proposed research and development project. It does not claim validated predictions, deployed alerts, or proven real-world performance.
+This project scaffold is provided under the MIT License. See [`LICENSE`](LICENSE).
